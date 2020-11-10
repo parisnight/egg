@@ -1,19 +1,20 @@
 /* Interface for X-windows Version 11       3/28/94  roa */
+/* gcc -shared -o xwin.o xwin.c thirty year old hack survives */
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include "n.h"
-#define posy 560
 
 Display *d;
 Window rw,w;
 GC gc;
 XSetWindowAttributes at;
 unsigned long col[16];
+int posy;
 
-setcolor (d,c)
+void setcolor (d,c)
 Display *d;
 unsigned long c[];
 { 
@@ -33,8 +34,7 @@ c[i]=c1.pixel;
 }
 }
  
-xopen(tr)
-struct transf *tr;
+void xopen(int x0, int y0, int x1, int y1)
 {
 Font font;
 /* XSetWindowAttributes at; */
@@ -43,9 +43,8 @@ d=XOpenDisplay(NULL);
 setcolor(d,&col[0]);
 
 rw=XDefaultRootWindow(d);
-/* w=XCreateSimpleWindow(d,rw,400,200,posy,posy,5,col[14],col[0]); 
-*/
-w=XCreateSimpleWindow(d,rw,200,200,posy,posy,1,col[14],col[0]); 
+w=XCreateSimpleWindow(d,rw,x0,y0,x1,y1,1,col[14],col[0]); 
+posy=y1;
 
 at.override_redirect=1;
 at.event_mask=ButtonPressMask;
@@ -65,16 +64,21 @@ XSetForeground(d,gc,col[2]);
 XSetLineAttributes(d,gc, 2,LineSolid,CapRound,JoinRound);
 }
 
-xlin(x,y,x1,y1,c)
-int x,y,x1,y1; int c;
-{
+void xsetline (int thickness, int c) {
+XSetLineAttributes(d,gc, thickness,LineSolid,CapRound,JoinRound);
 XSetForeground(d,gc,col[c]);
-/*  XSetPlaneMask(d,gc,AllPlanes); */
+}
+
+void xline(x,y,x1,y1)
+int x,y,x1,y1;
+{
+/*  XSetPlaneMask(d,gc,AllPlanes); 
+XSetForeground(d,gc,col[c]);*/
 XDrawLine(d,w,gc,x,posy-y,x1,posy-y1);
 /* XFlush(d);  MUST FLUSH, otherwise lose some lines that are queued up */
 }             /* flush moved to xclose() */
 
-xprint(x,y,str,c)
+void xprint(x,y,str,c)
 int x,y,c;
 char *str;
 {
@@ -96,9 +100,9 @@ printf("%f %f\n",f.x,f.y);
 return(f);
 } */
 
-fpoint ginxwin() /* 98.2 roa */
+float * ginxwin() /* 98.2 roa */
 {
-static fpoint f;
+static float f[2];
 XEvent event;
 
 /*XFlush(d);
@@ -106,13 +110,17 @@ while (! XEventsQueued(d,QueuedAfterFlush));
 */
 do XNextEvent(d, &event);
 while (event.type != ButtonPress);
-f.x= event.xbutton.x; f.y= posy - event.xbutton.y;
+f[0]= event.xbutton.x; f[1]= posy - event.xbutton.y;
 /*printf("%f %f\n",f.x,f.y);*/
 return(f);
 }
 
+void xflush ()
+{
+XFlush(d);
+}
 
-xclose ()
+void xclose ()
 {
 XFlush(d);
 /* getchar();
@@ -120,6 +128,17 @@ XFreeGC(d,gc);
 XDestroyWindow(d,w);
 XFlush(d);
 XCloseDisplay(d); */
+}
+
+void main ()
+{
+xopen(100,100,600,560);
+xsetline(1,10);
+xline(0,0,100,100);
+xprint(30,0,"hello world",4);
+xflush(); /* necessary to see any window at all */
+printf("ginxwin %f\n",*ginxwin());
+sleep(10);
 }
 
 /* miscellaneous x window notes
