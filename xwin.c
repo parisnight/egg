@@ -12,11 +12,9 @@ Window rw,w;
 GC gc;
 XSetWindowAttributes at;
 unsigned long col[16];
-int posy;
 
-void setcolor (d,c)
+void setcolor (d)
 Display *d;
-unsigned long c[];
 { 
 static char colorname[16][15]={
 "light gray","slate blue","red","yellow",
@@ -30,7 +28,7 @@ int i;
 colmap=XDefaultColormap(d,0);
 for (i=0;i<16; i++) {
 XAllocNamedColor(d,colmap,colorname[i],&c1,&c0);
-c[i]=c1.pixel;
+col[i]=c1.pixel;
 }
 }
  
@@ -40,11 +38,10 @@ Font font;
 /* XSetWindowAttributes at; */
 
 d=XOpenDisplay(NULL);
-setcolor(d,&col[0]);
+setcolor(d);
 
 rw=XDefaultRootWindow(d);
 w=XCreateSimpleWindow(d,rw,x0,y0,x1,y1,1,col[14],col[0]); 
-posy=y1;
 
 at.override_redirect=1;
 at.event_mask=ButtonPressMask;
@@ -74,16 +71,21 @@ int x,y,x1,y1;
 {
 /*  XSetPlaneMask(d,gc,AllPlanes); 
 XSetForeground(d,gc,col[c]);*/
-XDrawLine(d,w,gc,x,posy-y,x1,posy-y1);
+XDrawLine(d,w,gc,x,y,x1,y1);
 /* XFlush(d);  MUST FLUSH, otherwise lose some lines that are queued up */
 }             /* flush moved to xclose() */
+
+void xlines(short  *vertices, int npts)
+{
+  XDrawLines(d,w,gc,(XPoint *) vertices,npts,CoordModeOrigin);
+}
 
 void xprint(x,y,str,c)
 int x,y,c;
 char *str;
 {
 XSetForeground(d,gc,col[c]);
-XDrawString(d,w,gc,x,posy-y,str,strlen(str));
+XDrawString(d,w,gc,x,y,str,strlen(str));
 }
 
 /* before 98.2  This one worked only on Solaris, failed on BSD and Linux
@@ -100,19 +102,19 @@ printf("%f %f\n",f.x,f.y);
 return(f);
 } */
 
-float * ginxwin() /* 98.2 roa */
+XButtonEvent * ginxwin() /* 98.2 roa */
 {
-static float f[2];
-XEvent event;
+/*static float f[2];*/
+static XEvent event;
 
 /*XFlush(d);
 while (! XEventsQueued(d,QueuedAfterFlush));
 */
 do XNextEvent(d, &event);
 while (event.type != ButtonPress);
-f[0]= event.xbutton.x; f[1]= posy - event.xbutton.y;
-/*printf("%f %f\n",f.x,f.y);*/
-return(f);
+/*f[0]= event.xbutton.x; f[1]= event.xbutton.y;
+printf("%f %f\n",f.x,f.y);*/
+return(&event.xbutton);
 }
 
 void xflush ()
@@ -132,12 +134,14 @@ XCloseDisplay(d); */
 
 void main ()
 {
+  short p[]={4,4,4,40,40,40,40,4,4,4};
 xopen(100,100,600,560);
-xsetline(1,10);
+xsetline(3,10);
 xline(0,0,100,100);
-xprint(30,0,"hello world",4);
+ xlines(p,5);
+xprint(10,50,"hello world",4);
 xflush(); /* necessary to see any window at all */
-printf("ginxwin %f\n",*ginxwin());
+printf("ginxwin %d\n",ginxwin()->x);
 sleep(10);
 }
 
