@@ -1,5 +1,5 @@
-/* Interface for X-windows Version 11       3/28/94 */
-/* gcc -shared -o xwin.o xwin.c thirty year old hack survives */
+/* Interface for X-windows Version 11       3/28/94  roa */
+/* gcc -shared -o xwin.o xwin.c -lX11 thirty year old hack survives */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -35,9 +35,6 @@ Display *d;
 
 void xopen(int x0, int y0, int x1, int y1)
 {
-  if (i == 3) {
-    gotoy;
-  }
   Font font;
 /* XSetWindowAttributes at; */
 
@@ -58,7 +55,7 @@ XChangeWindowAttributes(d,w,CWBitGravity,&at); */
 /* XSetFunction(d,gc,GXset); */
 
   font = XLoadFont(d,
-/* 98.2 "-adobe-helvetica-bold-o-normal--17-120-100-100-p-92-iso8859-1");*/
+/* 98.2 roa "-adobe-helvetica-bold-o-normal--17-120-100-100-p-92-iso8859-1");*/
                    "-*-helvetica-*-*-*-*-*-100-100-100-*-*-*-*");
   XSetFont(d, gc, font);
   XSetForeground(d, gc, col[2]);
@@ -108,7 +105,7 @@ return(f);
 } */
 
 XButtonEvent *ginxwin()
-{                               /* 98.2 */
+{                               /* 98.2 roa */
 /*static float f[2];*/
   static XEvent event;
 
