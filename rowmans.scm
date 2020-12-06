@@ -13,26 +13,29 @@
 
 (define (coord c)
   (- (char->integer c) (char->integer #\R)))
-  
+
 (define (hprint str)
   ;;(string->number (string-trim (substring mys 0 5)))
   ;;(string->number (string-trim (substring mys 5 8)))
   (set! cursx (- cursx (coord (string-ref str 8))))
   (set! final (coord (string-ref str 9)))
-  (set! i 0)
+  (set! i 0) (set! oldcoord 0)
   (string-for-each
    (lambda (c)
-     (display (coord c))
-     (display " ")
-     (if (and (= -50 oldcoord) (= 0 (coord c)))
-	 (display lines)
-	 (append-coord i (coord c)))
-     (set! oldcoord (coord c))
+     (set! c (- (char->integer c) (char->integer #\R)))
+     ;;(display c) (display " ")
+     (if (and (= -50 oldcoord) (= 0 c))
+	 (begin
+	   (display lines)
+	   (display (quotient i 2))
+	  (set! i -1))
+	 (append-coord i c))
+     (set! oldcoord c)
      (set! i (1+ i)))
    (substring str 10)))
 
 
-(hprint mys)
+;;(hprint mys)
 
 (define rowmans
  "  699  1JZ
