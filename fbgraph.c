@@ -12,19 +12,26 @@
 char *fbp = 0;
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
+int colr;
 
-void put_pixel(int x, int y, int c)
+void put_pixeli1(int x, int y, int c)
 {
   unsigned int pix_offset = 4 * x + y * finfo.line_length;
   *((char *) (fbp + pix_offset)) = c;
+}
+
+void put_pixel(int x, int y, int c)
+{
+  * (int *) (fbp + 4 * x + y * finfo.line_length) = colr;
 }
 
 void draw()
 {
   int x, y;
 
-  // fill the screen with blue
-  memset(fbp, 1, vinfo.xres * vinfo.yres);
+  memset(&colr, 255, 1);
+
+  memset(fbp, 1, vinfo.xres * vinfo.yres); /* blue backgnd */
 
   for (y = 0; y < (vinfo.yres); y += 10) {
     for (x = 0; x < vinfo.xres; x++) {
@@ -39,11 +46,9 @@ void draw()
   }
 
   int n;
-  // select smaller extent (just in case someone has a portrait mode display)
   n = (vinfo.xres < vinfo.yres) ? vinfo.xres : vinfo.yres;
-  // red diagonal line from top left
   for (x = 0; x < n; x++) {
-    put_pixel(x, x, 4);
+    put_pixel(x, x, 4); /* red line */
   }
 
 }
@@ -59,19 +64,17 @@ int main(int argc, char *argv[])
     printf("Error: cannot open framebuffer device.\n");
     return (1);
   }
-  printf("The framebuffer device was opened successfully.\n");
 
   if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) {
     printf("Error reading variable information.\n");
   }
-  printf("Original %dx%d, %dbpp\n", vinfo.xres, vinfo.yres,
+  printf("vscreeninfo %dx%d, %dbpp\n", vinfo.xres, vinfo.yres,
          vinfo.bits_per_pixel);
 
-  // Store for reset (copy vinfo to vinfo_orig)
+  /* save for restoring (copy vinfo to vinfo_orig) */
   memcpy(&orig_vinfo, &vinfo, sizeof(struct fb_var_screeninfo));
 
-  // Change variable info - force 8 bit
-  //vinfo.bits_per_pixel = 8;
+  /*vinfo.bits_per_pixel = 8; force 8 bit */
   if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &vinfo)) {
     printf("Error setting variable information.\n");
   }
@@ -88,22 +91,14 @@ int main(int argc, char *argv[])
   if ((int) fbp == -1) {
     printf("Failed to mmap.\n");
   } else {
-    // draw...
     draw();
     sleep(5);
   }
 
-  // cleanup
-  // unmap fb file from memory
-  // unmap fb file from memory
   munmap(fbp, screensize);
-  // reset the display mode
   if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &orig_vinfo)) {
-    printf("Error re-setting variable information.\n");
+    printf("Error resetting variable screen information.\n");
   }
-  // close fb file    
   close(fbfd);
-
   return 0;
-
 }
