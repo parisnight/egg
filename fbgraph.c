@@ -4,53 +4,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
 
 char *fbp = 0;
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
-int colr;
+int color;
 
-void put_pixeli1(int x, int y, int c)
+void putpixel(int x, int y)
 {
-  unsigned int pix_offset = 4 * x + y * finfo.line_length;
-  *((char *) (fbp + pix_offset)) = c;
-}
-
-void put_pixel(int x, int y, int c)
-{
-  * (int *) (fbp + 4 * x + y * finfo.line_length) = colr;
+  * (int *) (fbp + 4 * x + y * finfo.line_length) = color;
 }
 
 void draw()
 {
   int x, y;
-
-  memset(&colr, 255, 1);
-
-  memset(fbp, 1, vinfo.xres * vinfo.yres); /* blue backgnd */
+  color=255<<0;
 
   for (y = 0; y < (vinfo.yres); y += 10) {
     for (x = 0; x < vinfo.xres; x++) {
-      put_pixel(x, y, 15);
+      putpixel(x, y);
     }
   }
 
   for (x = 0; x < vinfo.xres; x += 10) {
     for (y = 0; y < (vinfo.yres); y++) {
-      put_pixel(x, y, 15);
+      putpixel(x, y);
     }
   }
-
-  int n;
-  n = (vinfo.xres < vinfo.yres) ? vinfo.xres : vinfo.yres;
-  for (x = 0; x < n; x++) {
-    put_pixel(x, x, 4); /* red line */
-  }
-
 }
 
 int main(int argc, char *argv[])
