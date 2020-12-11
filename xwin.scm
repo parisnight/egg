@@ -1,5 +1,4 @@
 ;;;;; xwin.scm
-;;;;; gcc -lX11 -shared -o xwin.so -fPIC xwin.c
 
 (define-module (xwin xwin)
   #:use-module (system foreign)
