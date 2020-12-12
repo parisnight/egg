@@ -125,7 +125,7 @@ void fill_circle(int x0, int y0, int r)
 void fblines(short *p, int npts)
 {
   int i;
-  for (i = 0; i < npts; i++, p+=2)
+  for (i = 0; i < npts - 1; i++, p+=2)
     draw_line(p[0],p[1],p[2],p[3]);
 }
 
@@ -199,7 +199,7 @@ int main()
   color = 127;
   drawgrid();
   color=0xff0000;
-  fblines(p,4);
+  fblines(p,5);
   sleep(5);
   fbclose();
   return (0);

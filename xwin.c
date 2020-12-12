@@ -1,5 +1,5 @@
 /* Interface for X-windows Version 11       3/28/94  roa */
-/* gcc -shared -o xwin.o xwin.c -lX11 -fPIC thirty year old hack survives */
+/* gcc -shared -o xwin.o xwin.c -lX11 thirty year old hack survives */
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

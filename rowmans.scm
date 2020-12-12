@@ -1,15 +1,14 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
-(define mys (cadr (string-split rowmans #\newline)))
 (define cursx 0)
 (define cursy 20)
 (define i 0)
 (define final 0)
-(define lines (make-s16vector 20))
+(define lines (make-s16vector 60))
 (define oldcoord 0)
 
 (define (append-coord i x)
-  (s16vector-set! lines i x))
+  (s16vector-set! lines i (+ 50 x)))
 
 (define (coord c)
   (- (char->integer c) (char->integer #\R)))
@@ -19,23 +18,31 @@
   ;;(string->number (string-trim (substring mys 5 8)))
   (set! cursx (- cursx (coord (string-ref str 8))))
   (set! final (coord (string-ref str 9)))
-  (set! i 0) (set! oldcoord 0)
+  (set! i 0)
+  (set! oldcoord 0)
   (string-for-each
    (lambda (c)
      (set! c (- (char->integer c) (char->integer #\R)))
      ;;(display c) (display " ")
      (if (and (= -50 oldcoord) (= 0 c))
 	 (begin
+	   (fblines (bytevector->pointer lines) (quotient i 2))
 	   (display lines)
 	   (display (quotient i 2))
 	  (set! i -1))
 	 (append-coord i c))
      (set! oldcoord c)
      (set! i (1+ i)))
-   (substring str 10)))
+   (substring str 10))
+  (fblines (bytevector->pointer lines) (quotient i 2))
+  (display lines))
 
-
-;;(hprint mys)
+(define (gr)
+  (fbopen)
+  (bytevector-u32-native-set! color 0 #xffff00)
+  (fblines (bytevector->pointer (s16vector 4 4 4 40 40 40 40 4 4 4)) 4)
+;;  (fbclose)
+  )
 
 (define rowmans
  "  699  1JZ
@@ -138,3 +145,7 @@ SWRYQZP\\P^Q`RaTb
 QWRYSZT\\T^S`RaPb
  2246 24F^IUISJPLONOPPTSVTXTZS[Q RISJQLPNPPQTTVUXUZT[Q[O
   718 14KYQFOGNINKOMQNSNUMVKVIUGSFQF" )
+
+(define mys (list-ref (string-split rowmans #\newline) 36))
+;;(gr)
+;;(hprint mys)
