@@ -1,5 +1,9 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
+(use-modules (fbgraph fbgraph)
+	     (system foreign)
+	     (rnrs bytevectors))
+
 (define cursx 0)
 (define cursy 20)
 (define i 0)
