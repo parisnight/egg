@@ -4,20 +4,23 @@
 	     (system foreign)
 	     (rnrs bytevectors))
 
-(define cursx 0)
-(define cursy 20)
+(define cursx 50)
+(define cursy 50)
 (define i 0)
 (define final 0)
 (define lines (make-s16vector 60))
 (define oldcoord 0)
 
 (define (append-coord i x)
-  (s16vector-set! lines i (+ 50 x)))
+  (if (even? i)
+      (set! x (+ x cursx))
+      (set! x (+ x cursy)))
+  (s16vector-set! lines i x))
 
 (define (coord c)
   (- (char->integer c) (char->integer #\R)))
 
-(define (hprint str)
+(define (hershey-encoded-out str)
   ;;(string->number (string-trim (substring mys 0 5)))
   ;;(string->number (string-trim (substring mys 5 8)))
   (set! cursx (- cursx (coord (string-ref str 8))))
@@ -31,21 +34,23 @@
      (if (and (= -50 oldcoord) (= 0 c))
 	 (begin
 	   (fblines (bytevector->pointer lines) (quotient i 2))
-	   (display lines)
-	   (display (quotient i 2))
-	  (set! i -1))
+	   ;;(display lines)
+	   ;;(display (quotient i 2))
+	   (set! i -1))
 	 (append-coord i c))
      (set! oldcoord c)
      (set! i (1+ i)))
    (substring str 10))
   (fblines (bytevector->pointer lines) (quotient i 2))
-  (display lines))
+  (set! cursx (+ final cursx))
+  ;;(display lines)
+  )
 
 (define (gr)
   (fbopen)
   (bytevector-u32-native-set! color 0 #xffff00)
   (fblines (bytevector->pointer (s16vector 4 4 4 40 40 40 40 4 4 4)) 4)
-;;  (fbclose)
+  ;;  (fbclose)
   )
 
 (define rowmans
@@ -150,6 +155,14 @@ QWRYSZT\\T^S`RaPb
  2246 24F^IUISJPLONOPPTSVTXTZS[Q RISJQLPNPPQTTVUXUZT[Q[O
   718 14KYQFOGNINKOMQNSNUMVKVIUGSFQF" )
 
-(define mys (list-ref (string-split rowmans #\newline) 36))
+(define typeface (string-split rowmans #\newline))
+(define mychar (list-ref typeface 43))
 ;;(gr)
-;;(hprint mys)
+;;(hershey-encoded-out mychar)
+(define (hprint s)
+  (string-for-each
+   (lambda (c)
+     (hershey-encoded-out (list-ref typeface (- (char->integer c) 30))))
+   s))
+
+(hprint "Merry-Christmas")
