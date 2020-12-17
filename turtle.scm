@@ -64,14 +64,15 @@
 
 (define typeface (string-split rowmans #\newline))
 (define mychar (list-ref typeface 3))
-;;(gr)
-;;(hershey-encoded-out mychar)
+
 (define (hprint s)
   (string-for-each
    (lambda (c)
      (hershey-encoded-out (list-ref typeface (- (char->integer c) 30))))
    s))
 
+;;(gr)
+;;(hershey-encoded-out mychar)
 ;;(hprint "Merry-Christmas")
 
 (define a 0)
@@ -106,8 +107,9 @@
   (set! i (1+ i))
   (set! oldy y))
 
+(define degrees-radians (/ (atan 1) 45))
 (define (tortoise-turn angle)
-  (set! a (+ a (/ angle 57.3))))
+  (set! a (+ a (* angle degrees-radians))))
 
 (define (tortoise-move d)
   (let ((sa (sin a))
