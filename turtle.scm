@@ -159,8 +159,8 @@
 	  (tortoise-turn (* sign -120))
 	  (iterate (1+ i))))))
      
-;;     (snowflake 80 3 1)
-;;     (tortoise-turn 180)
-;;(render)
-;;     (snowflake 80 3 -1)
-;;(render)
+;; (snowflake 80 3 1)
+;; (tortoise-turn 180)
+;; (render)
+;; (snowflake 80 3 -1)
+;; (render)
