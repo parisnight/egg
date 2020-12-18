@@ -1,6 +1,5 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
-(load "fbgraph.scm")
 (use-modules (fbgraph fbgraph)
 	     (system foreign)
 	     (rnrs bytevectors))
@@ -127,7 +126,8 @@
 	    (tortoise-move side)
 	    (tortoise-turn angle)
 	    (iterate (1+ i)))))))
-     
+
+;; (gr)
 ;; (draw-polygon! 86 6)
 ;; (render)
      
