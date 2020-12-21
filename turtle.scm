@@ -1,5 +1,6 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
+(load "/home/fuzz/Downloads/egg/fbgraph.scm")
 (use-modules (fbgraph fbgraph)
 	     (system foreign)
 	     (rnrs bytevectors))
