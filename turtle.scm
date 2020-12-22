@@ -47,6 +47,12 @@
   ;;(display lines)
   )
 
+(define (hprint s)
+  (string-for-each
+   (lambda (c)
+     (hershey-encoded-out (list-ref typeface (- (char->integer c) 30))))
+   s))
+
 (define (gr)
   (fbopen)
   (bytevector-u32-native-set! color 0 #xffff00)
@@ -54,26 +60,14 @@
   ;;  (fbclose)
   )
 
-(define rowmans
- "  699  1JZ
-  714  9MWRFRT RRYQZR[SZRY
-  717  6JZNFNM RVFVM
-  733 12H]SBLb RYBRb RLOZO RKUYU
- 2246 24F^IUISJPLONOPPTSVTXTZS[Q RISJQLPNPPQTTVUXUZT[Q[O
-  718 14KYQFOGNINKOMQNSNUMVKVIUGSFQF" )
-
-(define typeface (string-split rowmans #\newline))
-(define mychar (list-ref typeface 3))
-
-(define (hprint s)
-  (string-for-each
-   (lambda (c)
-     (hershey-encoded-out (list-ref typeface (- (char->integer c) 30))))
-   s))
-
+;;(load "rowmans.scm")
+;;(load "gothicger.scm")
+;;(define typeface (string-split rowmans #\newline))
+;;(define typeface (string-split gothicger #\newline))
 ;;(gr)
-;;(hershey-encoded-out mychar)
+;;(hershey-encoded-out (list-ref typeface 3))
 ;;(hprint "Merry-Christmas")
+;;(hprint "j")
 
 (define a 0)
 (define oldx 100)
