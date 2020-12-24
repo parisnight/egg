@@ -50,7 +50,7 @@
 (define (hprint s)
   (string-for-each
    (lambda (c)
-     (hershey-encoded-out (list-ref typeface (- (char->integer c) 30))))
+     (hershey-encoded-out (list-ref typeface (- (char->integer c) 32))))
    s))
 
 (define (gr)
@@ -60,14 +60,24 @@
   ;;  (fbclose)
   )
 
+(define (setcursor x y)
+  (set! cursx x)
+  (set! cursy y)
+  (set! i 0))
+  
 ;;(load "rowmans.scm")
 ;;(load "gothicger.scm")
 ;;(define typeface (string-split rowmans #\newline))
 ;;(define typeface (string-split gothicger #\newline))
 ;;(gr)
 ;;(hershey-encoded-out (list-ref typeface 3))
-;;(hprint "Merry-Christmas")
-;;(hprint "j")
+;;(hprint "Merry Christmas")
+
+(define (showall)
+  (for-each
+   (lambda (letter)
+     (hershey-encoded-out letter))
+   typeface))
 
 (define a 0)
 (define oldx 100)
@@ -155,9 +165,17 @@
 	  (koch-line length depth)
 	  (tortoise-turn (* sign -120))
 	  (iterate (1+ i))))))
-     
-;; (snowflake 80 3 1)
-;; (tortoise-turn 180)
-;; (render)
-;; (snowflake 80 3 -1)
-;; (render)
+
+(define (doit)
+  (setcursor 400 50)
+  (snowflake 80 3 1)
+  (tortoise-turn 180)
+  (render)
+  (snowflake 80 3 -1)
+  (render)
+  (setcursor 400 280)
+  (hprint "Liebe Mama")
+  (setcursor 400 320)
+  (hprint "Frohliche Weinachsten"))
+
+;;(doit)
