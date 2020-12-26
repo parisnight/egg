@@ -1,6 +1,6 @@
 ;;;;; fbgraph.scm
 
-(define-module (fbgraph fbgraph)
+(define-module (fbgraph)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
   #:export (fbopen fblines fbclose demo color))

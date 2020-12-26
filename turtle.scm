@@ -1,7 +1,7 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
-(load "/home/fuzz/Downloads/egg/fbgraph.scm")
-(use-modules (fbgraph fbgraph)
+;;;;(primitive-load "/home/fuzz/Downloads/egg/fbgraph.scm")
+(use-modules (fbgraph)
 	     (system foreign)
 	     (rnrs bytevectors))
 
@@ -66,10 +66,10 @@
   (set! i 0))
   
 ;;(load "rowmans.scm")
-;;(load "gothicger.scm")
+(load "gothicger.scm")
 ;;(define typeface (string-split rowmans #\newline))
-;;(define typeface (string-split gothicger #\newline))
-;;(gr)
+(define typeface (string-split gothicger #\newline))
+(gr)
 ;;(hershey-encoded-out (list-ref typeface 3))
 ;;(hprint "Merry Christmas")
 
@@ -176,6 +176,6 @@
   (setcursor 400 280)
   (hprint "Liebe Mama")
   (setcursor 400 320)
-  (hprint "Frohliche Weinachsten"))
+  (hprint "Frohliche Weinachten"))
 
 ;;(doit)
