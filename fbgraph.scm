@@ -23,9 +23,13 @@
                       (dynamic-func "fbclose" fbwin)
                       (list)))
 
+(define (setcolor c)
+  (bytevector-u32-native-set! color 0 c))
+
+(setcolor #xffff00) ;; default
+
 (define (demo)
   (fbopen)
-  (bytevector-u32-native-set! color 0 #xffff00)
   ;;(xprint 30 60 (string->pointer "hello") 3)
   ;;(xsetline 2 4)
   (fblines (bytevector->pointer (s16vector 4 4 4 40 40 40 40 4 4 4)) 5)

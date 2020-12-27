@@ -1,6 +1,5 @@
 ;;;;; A. V. Hershey font   2020.12.10
 
-;;;;(primitive-load "/home/fuzz/Downloads/egg/fbgraph.scm")
 (use-modules (fbgraph)
 	     (system foreign)
 	     (rnrs bytevectors))
@@ -53,23 +52,19 @@
      (hershey-encoded-out (list-ref typeface (- (char->integer c) 32))))
    s))
 
-(define (gr)
-  (fbopen)
-  (bytevector-u32-native-set! color 0 #xffff00)
-  (fblines (bytevector->pointer (s16vector 4 4 4 40 40 40 40 4 4 4)) 4)
-  ;;  (fbclose)
-  )
-
 (define (setcursor x y)
   (set! cursx x)
   (set! cursy y)
   (set! i 0))
-  
-;;(load "rowmans.scm")
+
+(define (setcolor c)
+  (bytevector-u32-native-set! color 0 c))
+
 (load "gothicger.scm")
-;;(define typeface (string-split rowmans #\newline))
 (define typeface (string-split gothicger #\newline))
-(gr)
+(fbopen)
+;;(load "rowmans.scm")
+;;(define typeface (string-split rowmans #\newline))
 ;;(hershey-encoded-out (list-ref typeface 3))
 ;;(hprint "Merry Christmas")
 
@@ -132,7 +127,6 @@
 	    (tortoise-turn angle)
 	    (iterate (1+ i)))))))
 
-;; (gr)
 ;; (draw-polygon! 86 6)
 ;; (render)
      
