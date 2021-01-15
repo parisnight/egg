@@ -152,7 +152,5 @@ void main()
 at.backing_store=true; CWBackingStore;
 XSetFillRule(d,gc,rule);   use the Winding rule to fill in everything
 XSetFunction uses such integers as GXor GXand GXxor,  see X.h for explanation
-#include <X11/cursorfont.h> XRecolorCursor()
-XDefineCursor()
 Programmers Guide: XWIN   Xlib-C Language Interface   Graphics Series   at UMlib
 */
