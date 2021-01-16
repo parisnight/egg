@@ -149,8 +149,5 @@ void main()
 }
 
 /* miscellaneous x window notes
-at.backing_store=true; CWBackingStore;
-XSetFillRule(d,gc,rule);   use the Winding rule to fill in everything
-XSetFunction uses such integers as GXor GXand GXxor,  see X.h for explanation
 Programmers Guide: XWIN   Xlib-C Language Interface   Graphics Series   at UMlib
 */
