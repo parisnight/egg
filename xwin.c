@@ -148,6 +148,5 @@ void main()
   sleep(10);
 }
 
-/* miscellaneous x window notes
-Programmers Guide: XWIN   Xlib-C Language Interface   Graphics Series   at UMlib
+/* Programmers Guide: XWIN   Xlib-C Language Interface   Graphics Series   at UMlib
 */
