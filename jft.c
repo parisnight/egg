@@ -1,3 +1,5 @@
+/* gcc -lm -ljack -lfftw3 jft.c   2020.1 */
+
 #include <stdlib.h>
 #include <math.h>
 #include <fftw3.h>
@@ -11,6 +13,21 @@
 jack_client_t *client;
 jack_port_t *inputport[2];
 int srate=1;                    /* global sampling rate 1=jack not initialized yet */
+extern int color;
+
+#define N 512
+fftw_complex in[N],  out[N], in2[N]; /* double [2] */
+fftw_plan p, q;
+short pt[5000];
+
+short ytransform(double r, double i) {
+  double d;
+  d = (r*r + i*i);
+  if (d>0) d=20*log10(d); else d= -200;
+  if (d<0) d=0;
+  return(500-d);
+}
+
 
 int process (jack_nframes_t nframes, void *arg) {
   jack_position_t pos;
@@ -18,8 +35,22 @@ int process (jack_nframes_t nframes, void *arg) {
   int i, j;
   
   inport[0]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[0],nframes);
-  inport[1]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[1],nframes);
-//      for (j=0; j<nframes; j++) port[i][j]=0;
+//  inport[1]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[1],nframes);
+
+  for (i = 0; i < N; i++) {
+    in[i][0] = inport[0][i];
+    in[i][1] = 0;
+  }
+
+  fftw_execute(p);
+  for (i = 0; i < N; i++ ) {
+    pt[2*i]=i;
+    pt[2*i+1]= ytransform(out[i][0], out[i][1]);
+  }
+  fblines(pt,N);
+
+
+
 
 /*    printf("\033[s \033[0;0H \033[33m  %-8.0f %8d %d %40d %8d\033[u", 20.0f * log10f(peak), npeak,
 	   sampleactive, pos.frame/converttoframes, pos.frame/srate);
@@ -87,8 +118,10 @@ int main (int argc, char **argv) {
   float f;
   FILE *cfil, *stak[10];
   
-  jack_init();			/* do before loading samples and noteons so sampling rate known */
-
+  fbopen();
+  color=0xaaaaaaaa;
+  p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+  jack_init();
 
   path[0]=0;
   cfil=stak[0]=stdin; 
@@ -112,9 +145,19 @@ int main (int argc, char **argv) {
       } else cfil=stak[++stakptr]=fopen(str,"rt");
       break;
 
-    case 5: doit(); break;
+    case 5: break;
     case 6: fscanf(cfil, "%d", &i); break;
     case 7:
+  fbopen();
+  color = 0xff;
+  draw_line(0, 0, 400, 100);
+  color = 0xa0a000;
+  draw_circle(60, 60, 10);
+  fill_circle(407, 317, 34);
+  color = 127;
+  drawgrid();
+  color=0xaaaaaaaa;
+  sleep(1);
       break;
     case 8: break;
     case 9:  break;
@@ -124,40 +167,3 @@ int main (int argc, char **argv) {
   return(0);
 }
 
-#define N 16
-
-int doit(void) {
-  fftw_complex in[N], out[N], in2[N]; /* double [2] */
-  fftw_plan p, q;
-  int i;
-
-  /* prepare a cosine wave */
-  for (i = 0; i < N; i++) {
-    in[i][0] = cos(3 * 2*M_PI*i/N);
-    in[i][1] = 0;
-  }
-
-  /* forward Fourier transform, save the result in 'out' */
-  p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_execute(p);
-  for (i = 0; i < N; i++)
-    printf("freq: %3d %+9.5f %+9.5f I\n", i, out[i][0], out[i][1]);
-  fftw_destroy_plan(p);
-
-  /* backward Fourier transform, save the result in 'in2' */
-  printf("\nInverse transform:\n");
-  q = fftw_plan_dft_1d(N, out, in2, FFTW_BACKWARD, FFTW_ESTIMATE);
-  fftw_execute(q);
-  /* normalize */
-  for (i = 0; i < N; i++) {
-    in2[i][0] *= 1./N;
-    in2[i][1] *= 1./N;
-  }
-  for (i = 0; i < N; i++)
-    printf("recover: %3d %+9.5f %+9.5f I vs. %+9.5f %+9.5f I\n",
-        i, in[i][0], in[i][1], in2[i][0], in2[i][1]);
-  fftw_destroy_plan(q);
-
-  fftw_cleanup();
-  return 0;
-}
