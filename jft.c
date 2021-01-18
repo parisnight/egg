@@ -24,7 +24,7 @@ short ytransform(double r, double i) {
   double d;
   d = (r*r + i*i);
   if (d>0) d=20*log10(d); else d= -200;
-  if (d<0) d=0;
+  if (d<-200) d=-200;
   return(500-d);
 }
 
