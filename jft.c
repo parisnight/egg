@@ -18,7 +18,7 @@ extern int color;
 #define N 512
 fftw_complex in[N],  out[N], in2[N]; /* double [2] */
 fftw_plan p, q;
-short pt[5000];
+short pt[5000], ptold[5000];
 
 short ytransform(double r, double i) {
   double d;
@@ -28,7 +28,7 @@ short ytransform(double r, double i) {
   return(500-d);
 }
 
-
+int cycle=1;
 int process (jack_nframes_t nframes, void *arg) {
   jack_position_t pos;
   jack_default_audio_sample_t *inport[2];
@@ -45,10 +45,16 @@ int process (jack_nframes_t nframes, void *arg) {
   fftw_execute(p);
   for (i = 0; i < N; i++ ) {
     pt[2*i]=i;
-    pt[2*i+1]= ytransform(out[i][0], out[i][1]);
+    pt[2*i+1]= ((cycle-1)*pt[2*i+1] + ytransform(out[i][0], out[i][1]))/cycle;
   }
-  fblines(pt,N);
-
+  if (cycle++ > 5) {
+    color=0;
+    fblines(ptold,N); /* erase the previous line */
+    cycle=1;
+    color=0xaaaaaaaa;
+    fblines(pt,N);
+    for (i = 0; i < 2*N; i++) ptold[i]=pt[i];
+  }
 
 
 
@@ -119,7 +125,6 @@ int main (int argc, char **argv) {
   FILE *cfil, *stak[10];
   
   fbopen();
-  color=0xaaaaaaaa;
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   jack_init();
 
