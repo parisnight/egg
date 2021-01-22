@@ -187,7 +187,7 @@ void fbclose()
   close(fbfd);
 }
 
-int main()
+int maintemp()
 {
   short p[]={35,23,52,35,74,162,57,34,241,41};
   fbopen();

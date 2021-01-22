@@ -13,22 +13,35 @@
 jack_client_t *client;
 jack_port_t *inputport[2];
 int srate=1;                    /* global sampling rate 1=jack not initialized yet */
+int cycle=1, nave=5;
 extern int color;
 
 #define N 512
 fftw_complex in[N],  out[N], in2[N]; /* double [2] */
+double ind[N];
 fftw_plan p, q;
 short pt[5000], ptold[5000];
+short zeroline[]={0,500,500,500};
+int yoffset=0;
 
 short ytransform(double r, double i) {
   double d;
   d = (r*r + i*i);
-  if (d>0) d=20*log10(d); else d= -200;
+  if (d>0) d=10*log10(d); else d= -200;
   if (d<-200) d=-200;
-  return(500-d);
+  return(500-d+yoffset);
 }
 
-int cycle=1;
+void grid() {
+int i;
+for (i=0; i>= -100; i-=10) {
+zeroline[1]=zeroline[3]=500-i;
+fblines(zeroline,2);
+}
+
+}
+
+
 int process (jack_nframes_t nframes, void *arg) {
   jack_position_t pos;
   jack_default_audio_sample_t *inport[2];
@@ -40,20 +53,31 @@ int process (jack_nframes_t nframes, void *arg) {
   for (i = 0; i < N; i++) {
     in[i][0] = inport[0][i];
     in[i][1] = 0;
+    ind[i] = inport[0][i];
   }
 
-  fftw_execute(p);
+/*    color=0;
+  fblines(pt,N);
+*/
+  fftw_execute(q);
   for (i = 0; i < N; i++ ) {
     pt[2*i]=i;
     pt[2*i+1]= ((cycle-1)*pt[2*i+1] + ytransform(out[i][0], out[i][1]))/cycle;
+    //pt[2*i+1]= ytransform(out[i][0], out[i][1]);
   }
-  if (cycle++ > 5) {
-    color=0;
-    fblines(ptold,N); /* erase the previous line */
+/*    color=0xaaaaaaaa;
+  fblines(pt,N);
+*/
+if (cycle++ > nave) {
     cycle=1;
+    color=0;
+    fblines(ptold,N);
+    color=0x000000ff;
+    fblines(zeroline,2);
+grid();
     color=0xaaaaaaaa;
     fblines(pt,N);
-    for (i = 0; i < 2*N; i++) ptold[i]=pt[i];
+    for (i = 0; i < 2*N; i++) { ptold[i]=pt[i]; pt[i]=0; }
   }
 
 
@@ -126,6 +150,7 @@ int main (int argc, char **argv) {
   
   fbopen();
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+  q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
   jack_init();
 
   path[0]=0;
@@ -151,21 +176,10 @@ int main (int argc, char **argv) {
       break;
 
     case 5: break;
-    case 6: fscanf(cfil, "%d", &i); break;
-    case 7:
-  fbopen();
-  color = 0xff;
-  draw_line(0, 0, 400, 100);
-  color = 0xa0a000;
-  draw_circle(60, 60, 10);
-  fill_circle(407, 317, 34);
-  color = 127;
-  drawgrid();
-  color=0xaaaaaaaa;
-  sleep(1);
-      break;
+    case 6: fscanf(cfil, "%d", &i); nave=i; break;
+    case 7: fscanf(cfil, "%d", &yoffset); break;
     case 8: break;
-    case 9:  break;
+    case 9: break;
     }
   }
   }
