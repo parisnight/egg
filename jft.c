@@ -75,7 +75,7 @@ if (cycle++ > nave) {
     color=0;
     fblines(ptold,N);
     color=0x808080;
-    fblines(zeroline,2);
+    fblines(zeroline,24);
     color=0x0000ff;
     fblines(zeroline,2);
     color=0xaaaaaa;
@@ -155,7 +155,7 @@ int main (int argc, char **argv) {
     color=0x808080;
 grid();
     fblines(zeroline,24);
-exit(0);
+//exit(0);
 
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
