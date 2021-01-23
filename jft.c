@@ -21,24 +21,26 @@ fftw_complex in[N],  out[N], in2[N]; /* double [2] */
 double ind[N];
 fftw_plan p, q;
 short pt[5000], ptold[5000];
-short zeroline[]={0,500,500,500};
-int yoffset=0;
+short zeroline[300];
+int xr=500,yo=500,yoffset=0;
 
 short ytransform(double r, double i) {
   double d;
   d = (r*r + i*i);
   if (d>0) d=10*log10(d); else d= -200;
   if (d<-200) d=-200;
-  return(500-d+yoffset);
+  return(yo-d+yoffset);
 }
 
 void grid() {
-int i;
-for (i=0; i>= -100; i-=10) {
-zeroline[1]=zeroline[3]=500-i;
-fblines(zeroline,2);
-}
-
+  int i,j;
+  for (i=j=0; j<6; i+=8, j++) {
+    zeroline[i]=zeroline[i+6]=0;
+    zeroline[i+1]=zeroline[i+3]=yo+j*20;
+    zeroline[i+2]=zeroline[i+4]=xr;
+    zeroline[i+5]=zeroline[i+7]=yo+(j+1)*20-10;
+  }
+  for (i=0; i<20; i+=1) printf("%d ",zeroline[i]); 
 }
 
 
@@ -72,10 +74,11 @@ if (cycle++ > nave) {
     cycle=1;
     color=0;
     fblines(ptold,N);
-    color=0x000000ff;
+    color=0x808080;
     fblines(zeroline,2);
-grid();
-    color=0xaaaaaaaa;
+    color=0x0000ff;
+    fblines(zeroline,2);
+    color=0xaaaaaa;
     fblines(pt,N);
     for (i = 0; i < 2*N; i++) { ptold[i]=pt[i]; pt[i]=0; }
   }
@@ -149,6 +152,11 @@ int main (int argc, char **argv) {
   FILE *cfil, *stak[10];
   
   fbopen();
+    color=0x808080;
+grid();
+    fblines(zeroline,24);
+exit(0);
+
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
   jack_init();

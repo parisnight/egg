@@ -1,5 +1,5 @@
 /* fbgraph.c  2020.12.10 */
-/* gcc -shared -o fbwin.so fbwin.c */
+/* gcc -shared -o fbgraph.so fbgraph.c */
 
 #include <unistd.h>
 #include <stdio.h>
