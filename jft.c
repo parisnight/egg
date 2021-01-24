@@ -1,4 +1,4 @@
-/* gcc -lm -ljack -lfftw3 jft.c   2020.1 */
+/* gcc -lm -ljack -lfftw3 fbgraph.c jft.c   2020.1 */
 
 #include <stdlib.h>
 #include <math.h>
@@ -13,7 +13,8 @@
 jack_client_t *client;
 jack_port_t *inputport[2];
 int srate=1;                    /* global sampling rate 1=jack not initialized yet */
-int cycle=1, nave=5;
+int cycle=1, nave=5, xr=500,yo=500,yoffset=0;
+short zeroline[300];
 extern int color;
 
 #define N 512
@@ -21,8 +22,6 @@ fftw_complex in[N],  out[N], in2[N]; /* double [2] */
 double ind[N];
 fftw_plan p, q;
 short pt[5000], ptold[5000];
-short zeroline[300];
-int xr=500,yo=500,yoffset=0;
 
 short ytransform(double r, double i) {
   double d;
@@ -40,9 +39,8 @@ void grid() {
     zeroline[i+2]=zeroline[i+4]=xr;
     zeroline[i+5]=zeroline[i+7]=yo+(j+1)*20-10;
   }
-  for (i=0; i<20; i+=1) printf("%d ",zeroline[i]); 
+  /*for (i=0; i<20; i+=1) printf("%d ",zeroline[i]); */ 
 }
-
 
 int process (jack_nframes_t nframes, void *arg) {
   jack_position_t pos;
@@ -50,7 +48,6 @@ int process (jack_nframes_t nframes, void *arg) {
   int i, j;
   
   inport[0]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[0],nframes);
-//  inport[1]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[1],nframes);
 
   for (i = 0; i < N; i++) {
     in[i][0] = inport[0][i];
@@ -76,29 +73,18 @@ if (cycle++ > nave) {
     fblines(ptold,N);
     color=0x808080;
     fblines(zeroline,24);
-    color=0x0000ff;
-    fblines(zeroline,2);
     color=0xaaaaaa;
     fblines(pt,N);
-    for (i = 0; i < 2*N; i++) { ptold[i]=pt[i]; pt[i]=0; }
+    for (i = 0; i < 2*N; i++) ptold[i]=pt[i];
   }
-
-
-
-/*    printf("\033[s \033[0;0H \033[33m  %-8.0f %8d %d %40d %8d\033[u", 20.0f * log10f(peak), npeak,
-	   sampleactive, pos.frame/converttoframes, pos.frame/srate);
-  fflush(stdout);
-*/
   return(0);
 }
-
 
 void jack_init () {
   client = jack_client_open("jft", JackNullOption, NULL);
   srate = jack_get_sample_rate (client);
   jack_set_process_callback(client, process, 0);
   inputport[0] = jack_port_register(client, "in1",JACK_DEFAULT_AUDIO_TYPE,JackPortIsInput, 0);
-  inputport[1] = jack_port_register(client, "in2",JACK_DEFAULT_AUDIO_TYPE,JackPortIsInput, 0);
   jack_activate(client);
 }
 
@@ -113,8 +99,8 @@ char *menu[nmenu][nchoice] = {
    "!",
    "pipe       s",
    "r",
-   "ssampleactive     d",
-   "p",
+   "nave    d",
+   "yoffset d",
    "nframes"
   }
 };
@@ -152,14 +138,9 @@ int main (int argc, char **argv) {
   FILE *cfil, *stak[10];
   
   fbopen();
-    color=0x808080;
-grid();
-    fblines(zeroline,24);
-//exit(0);
-
+  jack_init();
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
-  jack_init();
 
   path[0]=0;
   cfil=stak[0]=stdin; 
@@ -184,10 +165,9 @@ grid();
       break;
 
     case 5: break;
-    case 6: fscanf(cfil, "%d", &i); nave=i; break;
+    case 6: fscanf(cfil, "%d", &nave); break;
     case 7: fscanf(cfil, "%d", &yoffset); break;
     case 8: break;
-    case 9: break;
     }
   }
   }
