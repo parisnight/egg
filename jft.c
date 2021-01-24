@@ -10,12 +10,11 @@
 #include <string.h>	        /* strcpy */
 #include <unistd.h>		/* read, sleep */
 
+extern int color;
 jack_client_t *client;
 jack_port_t *inputport[2];
-int srate=1;                    /* global sampling rate 1=jack not initialized yet */
-int cycle=1, nave=5, xr=500,yo=500,yoffset=0;
+int srate, mode=1, cycle=1, nave=5, xr=500,yo=500,yoffset=0;
 short zeroline[300];
-extern int color;
 
 #define N 512
 fftw_complex in[N],  out[N], in2[N]; /* double [2] */
@@ -42,13 +41,8 @@ void grid() {
   /*for (i=0; i<20; i+=1) printf("%d ",zeroline[i]); */ 
 }
 
-int process (jack_nframes_t nframes, void *arg) {
-  jack_position_t pos;
-  jack_default_audio_sample_t *inport[2];
+void fourier (jack_default_audio_sample_t *inport[]) {
   int i, j;
-  
-  inport[0]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[0],nframes);
-
   for (i = 0; i < N; i++) {
     in[i][0] = inport[0][i];
     in[i][1] = 0;
@@ -77,6 +71,26 @@ if (cycle++ > nave) {
     fblines(pt,N);
     for (i = 0; i < 2*N; i++) ptold[i]=pt[i];
   }
+}
+
+void oscilloscope (jack_default_audio_sample_t *inport[]) {
+  int i;
+  color=0;
+  fblines(pt,N);
+  for (i = 0; i < N; i++ ) {
+    pt[2*i]=i;
+    pt[2*i+1]= yo-250*inport[0][i];
+  }
+  color=0x808080;
+  fblines(pt,N);
+}
+
+int process (jack_nframes_t nframes, void *arg) {
+  jack_position_t pos;
+  jack_default_audio_sample_t *inport[2];
+  inport[0]=(jack_default_audio_sample_t *) jack_port_get_buffer(inputport[0],nframes);
+  if (mode) fourier(inport);
+  else oscilloscope(inport);
   return(0);
 }
 
@@ -98,10 +112,10 @@ char *menu[nmenu][nchoice] = {
    "%",
    "!",
    "pipe       s",
-   "r",
+   "mode d",
    "nave    d",
    "yoffset d",
-   "nframes"
+   "clear"
   }
 };
 
@@ -137,10 +151,11 @@ int main (int argc, char **argv) {
   float f;
   FILE *cfil, *stak[10];
   
-  fbopen();
-  jack_init();
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
+  grid();
+  fbopen();
+  jack_init();
 
   path[0]=0;
   cfil=stak[0]=stdin; 
@@ -164,10 +179,10 @@ int main (int argc, char **argv) {
       } else cfil=stak[++stakptr]=fopen(str,"rt");
       break;
 
-    case 5: break;
+    case 5: fscanf(cfil, "%d", &mode); break;
     case 6: fscanf(cfil, "%d", &nave); break;
     case 7: fscanf(cfil, "%d", &yoffset); break;
-    case 8: break;
+    case 8: system("clear"); break;
     }
   }
   }
