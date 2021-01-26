@@ -3,12 +3,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <fftw3.h>
-
 #include <jack/jack.h>
-#include <sys/fcntl.h>          /* for O_RDWR */
-#include <math.h>               /* exp2f */
-#include <string.h>	        /* strcpy */
-#include <unistd.h>		/* read, sleep */
+#include <string.h>	        /* strcmp */
 
 extern int color;
 jack_client_t *client;
@@ -17,17 +13,19 @@ int srate, mode=1, cycle=1, nave=5, xr=500,yo=500,yoffset=0;
 short zeroline[300];
 
 #define N 512
-fftw_complex in[N],  out[N], in2[N]; /* double [2] */
-double ind[N];
-fftw_plan p, q;
-short pt[5000], ptold[5000];
+double ind[N], acc[N];
+fftw_complex out[N]; /* double [2] */
+fftw_plan q;
+short pt[2*N], ptold[2*N];
 
-short ytransform(double r, double i) {
-  double d;
-  d = (r*r + i*i);
+double mag(double r ,double i) {
+  return(r*r+i*i);
+}
+
+double db(double d) {
   if (d>0) d=10*log10(d); else d= -200;
-  if (d<-200) d=-200;
-  return(yo-d+yoffset);
+//  if (d<-200) d= -200;
+  return(d);
 }
 
 void grid() {
@@ -44,25 +42,20 @@ void grid() {
 void fourier (jack_default_audio_sample_t *inport[]) {
   int i, j;
   for (i = 0; i < N; i++) {
-    in[i][0] = inport[0][i];
-    in[i][1] = 0;
     ind[i] = inport[0][i];
   }
 
-/*    color=0;
-  fblines(pt,N);
-*/
   fftw_execute(q);
   for (i = 0; i < N; i++ ) {
-    pt[2*i]=i;
-    pt[2*i+1]= ((cycle-1)*pt[2*i+1] + ytransform(out[i][0], out[i][1]))/cycle;
-    //pt[2*i+1]= ytransform(out[i][0], out[i][1]);
+    acc[i]= ((cycle-1)*acc[i] + mag(out[i][0], out[i][1]))/cycle;
   }
-/*    color=0xaaaaaaaa;
-  fblines(pt,N);
-*/
-if (cycle++ > nave) {
+
+  if (cycle++ > nave) {
     cycle=1;
+    for (i = 0; i < N; i++ ) {
+      pt[2*i]=i;
+      pt[2*i+1]= yo + yoffset - db(acc[i]);
+    }
     color=0;
     fblines(ptold,N);
     color=0x808080;
@@ -151,7 +144,6 @@ int main (int argc, char **argv) {
   float f;
   FILE *cfil, *stak[10];
   
-  p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
   grid();
   fbopen();
