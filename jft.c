@@ -12,8 +12,8 @@ jack_port_t *inputport[2];
 int srate, mode=1, cycle=1, nave=5, xr=500,yo=500,yoffset=0;
 short zeroline[300];
 
-#define N 512
-double ind[N], acc[N];
+#define N 1024
+double ind[N], acc[N], window[N];
 fftw_complex out[N]; /* double [2] */
 fftw_plan q;
 short pt[2*N], ptold[2*N];
@@ -42,7 +42,7 @@ void grid() {
 void fourier (jack_default_audio_sample_t *inport[]) {
   int i, j;
   for (i = 0; i < N; i++) {
-    ind[i] = inport[0][i];
+    ind[i] = inport[0][i] * window[i] * window[i];
   }
 
   fftw_execute(q);
@@ -148,7 +148,10 @@ int main (int argc, char **argv) {
   grid();
   fbopen();
   jack_init();
-
+  for (i=0; i<N; i++) { /* parzen, hamming */
+    //window[i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
+    window[i] = 0.54 - 0.46 * cos(6.28  * i / N);
+  }
   path[0]=0;
   cfil=stak[0]=stdin; 
   while (1) {
