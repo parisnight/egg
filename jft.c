@@ -9,12 +9,12 @@
 extern int color;
 jack_client_t *client;
 jack_port_t *inputport[2];
-int srate, mode=1, cycle=1, nave=5, xr=500,yo=500,yoffset=0;
+int srate, mode=1, cycle=1, nave=5, yo=500,yoffset=0,whichwin=3;
 short zeroline[300];
 
 #define N 1024
-double ind[N], acc[N], window[N];
-fftw_complex out[N]; /* double [2] */
+double ind[N], acc[N], window[5][N];
+fftw_complex out[N];
 fftw_plan q;
 short pt[2*N], ptold[2*N];
 
@@ -24,7 +24,6 @@ double mag(double r ,double i) {
 
 double db(double d) {
   if (d>0) d=10*log10(d); else d= -200;
-//  if (d<-200) d= -200;
   return(d);
 }
 
@@ -33,7 +32,7 @@ void grid() {
   for (i=j=0; j<6; i+=8, j++) {
     zeroline[i]=zeroline[i+6]=0;
     zeroline[i+1]=zeroline[i+3]=yo+j*20;
-    zeroline[i+2]=zeroline[i+4]=xr;
+    zeroline[i+2]=zeroline[i+4]= N/2;
     zeroline[i+5]=zeroline[i+7]=yo+(j+1)*20-10;
   }
   /*for (i=0; i<20; i+=1) printf("%d ",zeroline[i]); */ 
@@ -42,7 +41,7 @@ void grid() {
 void fourier (jack_default_audio_sample_t *inport[]) {
   int i, j;
   for (i = 0; i < N; i++) {
-    ind[i] = inport[0][i] * window[i] * window[i];
+    ind[i] = inport[0][i] * window[whichwin][i];
   }
 
   fftw_execute(q);
@@ -52,17 +51,17 @@ void fourier (jack_default_audio_sample_t *inport[]) {
 
   if (cycle++ > nave) {
     cycle=1;
-    for (i = 0; i < N; i++ ) {
+    for (i = 0; i < N/2; i++ ) {
       pt[2*i]=i;
       pt[2*i+1]= yo + yoffset - db(acc[i]);
     }
     color=0;
-    fblines(ptold,N);
+    fblines(ptold,N/2);
     color=0x808080;
     fblines(zeroline,24);
     color=0xaaaaaa;
-    fblines(pt,N);
-    for (i = 0; i < 2*N; i++) ptold[i]=pt[i];
+    fblines(pt,N/2);
+    for (i = 0; i < N; i++) ptold[i]=pt[i];
   }
 }
 
@@ -97,7 +96,7 @@ void jack_init () {
 
 #define EXIT 999
 #define nmenu 1
-#define nchoice 9
+#define nchoice 10
 char *menu[nmenu][nchoice] = {
   {
    "?",
@@ -108,6 +107,7 @@ char *menu[nmenu][nchoice] = {
    "mode d",
    "nave    d",
    "yoffset d",
+   "whichwin d",
    "clear"
   }
 };
@@ -148,9 +148,11 @@ int main (int argc, char **argv) {
   grid();
   fbopen();
   jack_init();
-  for (i=0; i<N; i++) { /* parzen, hamming */
-    //window[i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
-    window[i] = 0.54 - 0.46 * cos(6.28  * i / N);
+  for (i=0; i<N; i++) { /* square, parzen, hamming, hanning */
+    window[0][i] = 1.0;
+    window[1][i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
+    window[2][i] = 0.54 - 0.46 * cos(8*atan(1)  * i / (N-1));
+    window[3][i] = 0.5 - 0.5 * cos(8*atan(1)  * i / (N-1));
   }
   path[0]=0;
   cfil=stak[0]=stdin; 
@@ -177,7 +179,9 @@ int main (int argc, char **argv) {
     case 5: fscanf(cfil, "%d", &mode); break;
     case 6: fscanf(cfil, "%d", &nave); break;
     case 7: fscanf(cfil, "%d", &yoffset); break;
-    case 8: system("clear"); break;
+    case 8: fscanf(cfil, "%d", &whichwin); break;
+    case 9: system("clear"); break;
+    default: break;
     }
   }
   }
