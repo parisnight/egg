@@ -149,10 +149,10 @@ int main (int argc, char **argv) {
   fbopen();
   jack_init();
   for (i=0; i<N; i++) { /* square, parzen, hamming, hanning */
-    window[0][i] = 1.0:
+    window[0][i] = 1.0;
     window[1][i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
     window[2][i] = 0.54 - 0.46 * cos(8*atan(1)  * i / (N-1));
-    window[3][i] = 0.5 - 0.5 * cos(8*atan(1)  * (i+1) / (N-1));
+    window[3][i] = 0.5 - 0.5 * cos(8*atan(1)  * i / (N-1));
   }
   path[0]=0;
   cfil=stak[0]=stdin; 
