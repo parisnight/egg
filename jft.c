@@ -13,7 +13,7 @@ int srate, mode=1, cycle=1, nave=5, yo=500,yoffset=0,whichwin=3;
 short zeroline[300];
 
 #define N 1024
-double ind[N], acc[N], window[5][N];
+double ind[N], acc[N], window[6][N];
 fftw_complex out[N];
 fftw_plan q;
 short pt[2*N], ptold[2*N];
@@ -138,6 +138,7 @@ int choice (int m, char *s, FILE *fil) {
   return (i);
 }
 
+#define PI2 8*atan(1)
 int main (int argc, char **argv) {
   int i, j, mipo, cmd, stakptr=0; /* no static vars need initialization */
   char str[80], path[80], fil[80];
@@ -151,8 +152,11 @@ int main (int argc, char **argv) {
   for (i=0; i<N; i++) { /* square, parzen, hamming, hanning */
     window[0][i] = 1.0;
     window[1][i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
-    window[2][i] = 0.54 - 0.46 * cos(8*atan(1)  * i / (N-1));
-    window[3][i] = 0.5 - 0.5 * cos(8*atan(1)  * i / (N-1));
+    window[2][i] = 0.54 - 0.46 * cos(PI2  * i / (N-1));
+    window[3][i] = 0.50 - 0.50 * cos(PI2  * i / (N-1));
+    /* blackman scholes */
+    window[4][i] = 0.355768-0.487396*cos(PI2*i /N ) + 0.144232*cos(2*PI2*i /N ) - 0.012604*cos(3*PI2*i /N );
+    window[5][i] = 10.0/32-15.0/32*cos(PI2*i /N ) + 6.0/32*cos(2*PI2*i /N ) - 1.0/32*cos(3*PI2*i /N );
   }
   path[0]=0;
   cfil=stak[0]=stdin; 
