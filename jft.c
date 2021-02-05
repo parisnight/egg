@@ -148,7 +148,6 @@ int main (int argc, char **argv) {
   q = fftw_plan_dft_r2c_1d(N, ind, out, FFTW_ESTIMATE);
   grid();
   fbopen();
-  jack_init();
   for (i=0; i<N; i++) { /* square, parzen, hamming, hanning */
     window[0][i] = 1.0;
     window[1][i] = 1 - fabs((i-(N-1)/2.0)*2/(N+1));
@@ -158,6 +157,7 @@ int main (int argc, char **argv) {
     window[4][i] = 0.355768-0.487396*cos(PI2*i /N ) + 0.144232*cos(2*PI2*i /N ) - 0.012604*cos(3*PI2*i /N );
     window[5][i] = 10.0/32-15.0/32*cos(PI2*i /N ) + 6.0/32*cos(2*PI2*i /N ) - 1.0/32*cos(3*PI2*i /N );
   }
+  jack_init();
   path[0]=0;
   cfil=stak[0]=stdin; 
   while (1) {
