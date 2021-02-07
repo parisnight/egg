@@ -7,7 +7,7 @@ int main(void) {
   fftw_plan p, q;
   int i;
 
-  /* prepare a cosine wave */
+  /* prepare a cosine wave, fitting in one FFT cycle */
   for (i = 0; i < N; i++) {
     in[i][0] = cos(3 * 2*M_PI*i/N);
     in[i][1] = 0;
