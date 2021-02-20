@@ -9,7 +9,7 @@
 extern int color;
 jack_client_t *client;
 jack_port_t *inputport[2];
-int srate, mode=1, cycle=1, nave=5, yo=500,yoffset=0,whichwin=3;
+int srate, mode=1, cycle=1, nave=5, yo=500,yoffset=0,whichwin=4;
 short zeroline[300];
 
 #define N 1024
