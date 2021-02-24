@@ -27,7 +27,7 @@
 ;(parse-c-struct (make-c-struct (list int64 uint8)
 ;			       (list 300 43))
 ;		(list int64 uint8))
-;⇒ (300 43)
+; (300 43)
 
 (parse-c-struct p (list uint32 uint32))
 (pointer->bytevector p 8 0 'u32)
