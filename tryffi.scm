@@ -46,8 +46,6 @@
 (use-modules (ice-9 iconv))
 (bytevector->string (pointer->bytevector strp 40) "ISO-8859-1")
 
-
-
 #|
 (define mybv (make-bytevector 24))
 (bytevector-ieee-double-native-set! mybv 0 1.0)
