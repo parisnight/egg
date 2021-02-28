@@ -1,4 +1,4 @@
-/* gcc -shared -o libbessel.so -fPIC my.c */
+/* gcc -shared -o libbessel.so -fPIC -I/usr/include/guile/2.0 my.c */
 
 #include <math.h>
 #include <libguile.h>
