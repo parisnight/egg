@@ -39,6 +39,7 @@
                         (dynamic-func "memcpy" this)
                         (list '* '* size_t))))
 
+
 (use-modules (rnrs bytevectors))
 
 (define src-bits
