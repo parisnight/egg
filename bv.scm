@@ -1,3 +1,5 @@
+;; manipulations of scheme byte vectors
+
 (define bv #vu8(0 1 2 3))
 
 (array? bv)
