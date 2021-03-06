@@ -1,7 +1,9 @@
+/* fft.c demonstrate fftw library routines */
 #include <stdlib.h>
 #include <math.h>
 #include <fftw3.h>
 #define N 16
+
 int main(void) {
   fftw_complex in[N], out[N], in2[N]; /* double [2] */
   fftw_plan p, q;
