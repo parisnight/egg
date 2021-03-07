@@ -1,4 +1,4 @@
-;; manipulations of scheme byte vectors
+;; manipulations of scheme byte vectors 2020.11
 
 (define bv #vu8(0 1 2 3))
 
