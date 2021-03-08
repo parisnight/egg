@@ -5,6 +5,7 @@
 #include <fftw3.h>
 #include <jack/jack.h>
 #include <string.h>	        /* strcmp */
+#define PI2 8*atan(1)
 
 extern int color;
 jack_client_t *client;
@@ -138,7 +139,6 @@ int choice (int m, char *s, FILE *fil) {
   return (i);
 }
 
-#define PI2 8*atan(1)
 int main (int argc, char **argv) {
   int i, j, mipo, cmd, stakptr=0; /* no static vars need initialization */
   char str[80], path[80], fil[80];
