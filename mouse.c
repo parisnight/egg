@@ -2,10 +2,12 @@
 
 #include <stdio.h>
 #include <gpm.h>
+
 int my_handler(Gpm_Event *event, void *data)
 {       printf("Event Type : %d at x=%d y=%d\n", event->type, event->x, event->y);
         return 0;       
 }
+
 int main()
 {       Gpm_Connect conn;
         int c;
