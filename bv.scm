@@ -19,8 +19,7 @@
 (array-type bv)
 ⇒ vu8
 
-(parse-c-struct (make-c-struct (list int64 uint8)
-                               (list 300 43))
+(parse-c-struct (make-c-struct (list int64 uint8) (list 300 43))
                 (list int64 uint8))
 
 
