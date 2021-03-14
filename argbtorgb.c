@@ -1,5 +1,5 @@
 /* removes third byte argb -> rgb 2020.12.19 */
-/* used to convert raw framebuffer into something suitable for gimp */
+/* converts raw framebuffer into something suitable for gimp */
 
 #include <stdio.h>
 
