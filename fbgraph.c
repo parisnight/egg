@@ -146,7 +146,6 @@ void drawgrid()
 
 void fbopen()
 {
-
   fbfd = open("/dev/fb0", O_RDWR);
   if (fbfd == -1) {
     printf("Error: cannot open framebuffer device.\n");
