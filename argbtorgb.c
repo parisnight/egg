@@ -21,5 +21,4 @@ void main(int argc, char **argv)
     else
       b[3 - (i % 4)] = c;       /* swap byte ordering */
   }
-
 }
