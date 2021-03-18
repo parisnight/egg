@@ -86,4 +86,3 @@
 	  (fill-bv bv r (+ 2 n)))))
 
      (fill-bv (make-s32vector (* count 2)) (list 1 2 3 4 5 6) 0)
-  
