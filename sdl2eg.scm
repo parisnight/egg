@@ -1,4 +1,4 @@
-;;; rendering with guile-sdl2 2020.10.15
+;;; graphic rendering with guile-sdl2 2020.10.15
 
 (use-modules (sdl2)
              (sdl2 render)
