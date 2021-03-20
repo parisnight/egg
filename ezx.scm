@@ -55,14 +55,14 @@
 
 (define (make-ezx-color r g b) (f64vector r g b) )  ; SRFI-4
 
-;(define ezx-next-event get-next-event)
-;(ezx-set-background ezx (make-ezx-color 1 1 1))
-;(ezx-lines-2d ezxp (scm->pointer points) (scm->pointer (make-ezx-color 1 0 0)) 4)
-;(ezx-lines-2d-lolevel ezxp (scm->pointer points) 10 (scm->pointer (make-ezx-color 1 0 0)) 4)
-;  (define str (bytevector->pointer (string->utf8 "hello\0")))
-;  (define points (s32vector 2 2 42 2 42 42 2 42 2 2))
-;  (bytevector->pointer (s32-list->bytevector '(2 2 42 2 42 42 2 42 2 2))))
-;  (bytevector->pointer (u8-list->bytevector '(255 0 255))))
+;;(define ezx-next-event get-next-event)
+;;(ezx-set-background ezx (make-ezx-color 1 1 1))
+;;(ezx-lines-2d ezxp (scm->pointer points) (scm->pointer (make-ezx-color 1 0 0)) 4)
+;;(ezx-lines-2d-lolevel ezxp (scm->pointer points) 10 (scm->pointer (make-ezx-color 1 0 0)) 4)
+;;  (define str (bytevector->pointer (string->utf8 "hello\0")))
+;;  (define points (s32vector 2 2 42 2 42 42 2 42 2 2))
+;;  (bytevector->pointer (s32-list->bytevector '(2 2 42 2 42 42 2 42 2 2))))
+;;  (bytevector->pointer (u8-list->bytevector '(255 0 255))))
 
 (define ezxp (ezx-init 200 100 (string->pointer "goodbye")))
 
