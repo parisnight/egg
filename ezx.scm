@@ -51,6 +51,7 @@
 (define (ezx-poly-3d ezx points hx hy hz color)
   (ezx-poly-3d-lolevel ezx points hx hy hz (s32vector-length points) color))
 
+
 (use-modules (rnrs bytevectors))
 
 (define (make-ezx-color r g b) (f64vector r g b) )  ; SRFI-4
